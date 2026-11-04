@@ -15,10 +15,19 @@ public class PlayerMovement : MonoBehaviour
     // Vertical movement
     private Vector3 velocity;
 
+    // Camera reference
+    private Transform cameraTransform;
+
     void Start()
     {
         // Get Character Controller
         controller = GetComponent<CharacterController>();
+
+        // Get main camera
+        if (Camera.main != null)
+        {
+            cameraTransform = Camera.main.transform;
+        }
     }
 
     void Update()
@@ -33,6 +42,21 @@ public class PlayerMovement : MonoBehaviour
             0f,
             vertical
         );
+
+        // Make movement relative to camera
+        if (cameraTransform != null)
+        {
+            Vector3 forward = cameraTransform.forward;
+            Vector3 right = cameraTransform.right;
+
+            forward.y = 0f;
+            right.y = 0f;
+
+            forward.Normalize();
+            right.Normalize();
+
+            movement = right * horizontal + forward * vertical;
+        }
 
         // Prevent faster diagonal movement
         movement = Vector3.ClampMagnitude(movement, 1f);
